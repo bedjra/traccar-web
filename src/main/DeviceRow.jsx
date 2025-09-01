@@ -4,6 +4,7 @@ import {
   IconButton, Tooltip, Avatar, ListItemAvatar, ListItemText, ListItemButton,
   Typography,
 } from '@mui/material';
+import VideocamIcon from '@mui/icons-material/Videocam'; // 🎥 bouton vidéo
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
 import Battery60Icon from '@mui/icons-material/Battery60';
@@ -22,6 +23,8 @@ import { mapIconKey, mapIcons } from '../map/core/preloadImages';
 import { useAdministrator } from '../common/util/permissions';
 import EngineIcon from '../resources/images/data/engine.svg?react';
 import { useAttributePreference } from '../common/util/preferences';
+import { useState } from 'react';
+import VideoModal from './VideoModal'; // <-- ✅ on importe la modal
 
 dayjs.extend(relativeTime);
 
@@ -66,6 +69,12 @@ const DeviceRow = ({ devices, index, style }) => {
 
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
   const deviceSecondary = useAttributePreference('deviceSecondary', '');
+
+  // ✅ état pour la modal vidéo
+  const [openVideo, setOpenVideo] = useState(false);
+
+  // ✅ URL du flux (adapter avec ton serveur vidéo)
+  const streamUrl = `http://ton-serveur/live/${item.id}/index.m3u8`;
 
   const secondaryText = () => {
     let status;
@@ -147,9 +156,23 @@ const DeviceRow = ({ devices, index, style }) => {
                 </IconButton>
               </Tooltip>
             )}
+
+            {/* ✅ Bouton vidéo */}
+            <Tooltip title="Voir la vidéo">
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); setOpenVideo(true); }}>
+                <VideocamIcon fontSize="small" className={classes.success} />
+              </IconButton>
+            </Tooltip>
           </>
         )}
       </ListItemButton>
+
+      {/* ✅ Modal vidéo */}
+      <VideoModal
+        open={openVideo}
+        onClose={() => setOpenVideo(false)}
+        streamUrl={streamUrl}
+      />
     </div>
   );
 };
